@@ -1,10 +1,10 @@
 <!-- Chosen Palette: Professional Forex Blue (Navy, White, Slate, Success Green) -->
 <!-- Application Structure Plan: 
-    1. **Onboarding:** หน้าแรกอธิบายภาพรวม
-    2. **Interactive Guide:** ขั้นตอนการติดตั้งแบบทีละ Step (Stepper) แทนการอ่านยาวๆ
-    3. **Calculator (Simulator):** ส่วนสำคัญที่สุด คือการแปลง Text ในข้อ 5 (Input) ให้เป็นเครื่องมือคำนวณจริง
-        - User กรอกเงินทุน -> App คำนวณ Safety Stop Out ให้เห็นตัวเลขจริง
-        - User กรอก Max Lot/Max Orders -> App พล็อตกราฟแท่งแสดงการออกไม้ (Martingale) ให้เห็นว่าไม้ไหนจะติด Max Lot
+    Responsive Design Update:
+    - Navbar: Stacked layout on mobile for better visibility.
+    - Grid System: Single column on mobile, Multi-column on desktop.
+    - Inputs: Larger touch targets, responsive flex layouts for labels/inputs.
+    - Mockups: Max-width constraints with internal scrolling to prevent page overflow.
 -->
 <!-- Visualization & Content Choices:
     1. **CSS Mockups:** ใช้ CSS สร้างหน้าต่างจำลอง MT5 แทนรูปภาพ เพื่อความคมชัดและโหลดไว
@@ -17,22 +17,21 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>คู่มือติดตั้งและจำลองการตั้งค่า EA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
-        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
         
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
+            height: 250px; /* Mobile height */
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
         }
 
         /* Mockup Styles for MT5 Windows */
@@ -42,6 +41,8 @@
             box-shadow: 4px 4px 10px rgba(0,0,0,0.15);
             font-family: Tahoma, sans-serif;
             font-size: 13px;
+            width: 100%;
+            max-width: 100%;
         }
         .mt5-header {
             background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
@@ -52,151 +53,165 @@
             align-items: center;
             color: black;
             font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .mt5-body { padding: 12px; background: white; }
+        .mt5-body { padding: 12px; background: white; overflow-x: auto; }
         
         /* Input Table Styles */
-        .mt5-table { width: 100%; border-collapse: collapse; font-family: 'Tahoma', sans-serif; font-size: 11px; }
-        .mt5-table th { background-color: #f0f0f0; border: 1px solid #d0d0d0; padding: 2px 4px; text-align: left; font-weight: normal; color: #555; }
-        .mt5-table td { border: 1px solid #e0e0e0; padding: 2px 4px; color: #333; }
+        .mt5-table { width: 100%; min-width: 300px; border-collapse: collapse; font-family: 'Tahoma', sans-serif; font-size: 11px; }
+        .mt5-table th { background-color: #f0f0f0; border: 1px solid #d0d0d0; padding: 4px; text-align: left; font-weight: normal; color: #555; }
+        .mt5-table td { border: 1px solid #e0e0e0; padding: 4px; color: #333; }
         .mt5-table tr:nth-child(even) { background-color: #f9f9f9; }
         .mt5-icon-ab { color: #d97706; font-weight: bold; margin-right: 4px; font-family: serif; }
         .mt5-icon-num { color: #2563eb; font-weight: bold; margin-right: 4px; font-size: 10px; }
 
-        .nav-btn.active { background-color: #2563eb; color: white; }
-        .nav-btn:not(.active):hover { background-color: #e2e8f0; }
+        .nav-btn.active { background-color: #2563eb; color: white; border-color: #2563eb; }
+        .nav-btn:not(.active):hover { background-color: #e2e8f0; color: #1e293b; }
         
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Sim Input Styles to match MT5 */
+        
+        /* Sim Input Styles to match MT5 but Mobile Friendly */
         .sim-input-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 12px 0; /* Larger touch area */
             border-bottom: 1px dashed #e2e8f0;
+            flex-wrap: wrap;
         }
         .sim-input-label {
             font-family: 'Tahoma', sans-serif;
-            font-size: 12px;
+            font-size: 13px; /* Larger font */
             color: #333;
             flex: 1;
-            padding-right: 8px;
+            padding-right: 12px;
+            min-width: 200px; /* Ensure text doesn't squash too much */
         }
         .sim-input-field {
-            width: 100px;
+            width: 120px;
+        }
+        /* Make inputs touch-friendly */
+        .sim-input-field input {
+            font-size: 16px; /* Prevents iOS zoom */
         }
         
-        /* Info box style for explanations */
         .info-box {
-            font-size: 11px;
+            font-size: 13px; /* Readable on mobile */
             color: #475569;
             background-color: #f1f5f9;
-            padding: 8px;
-            border-radius: 4px;
-            margin-bottom: 12px;
-            border-left: 3px solid #cbd5e1;
-            line-height: 1.5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            border-left: 4px solid #cbd5e1;
+            line-height: 1.6;
         }
         .info-title {
             font-weight: bold;
             color: #334155;
             display: block;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            font-size: 14px;
         }
+
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="text-slate-800 bg-slate-50">
 
-    <!-- Top Bar -->
-    <nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
-                <!-- LOGO & BRANDING -->
-                <div class="font-bold text-xl tracking-wide flex items-center gap-3">
-                    <img src="https://raw.githubusercontent.com/maxghmain/FastAndFitEA/refs/heads/main/A%20200x200%20logo%20design%20for%20'Fast%20and%20Fit%20EA%20Over%20Trand'.%20The%20logo%20should%20convey%20speed%2C%20fitness%2C%20and%20f.jpeg" alt="FAF Logo" class="h-10 w-10 rounded-full border border-white/20 object-cover">
-                    <span>FAF Team (Fast and Fit EA)</span>
+    <!-- Top Bar: Responsive Layout -->
+    <nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0">
+                <!-- LOGO -->
+                <div class="font-bold text-lg tracking-wide flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
+                    <img src="https://raw.githubusercontent.com/maxghmain/FastAndFitEA/refs/heads/main/A%20200x200%20logo%20design%20for%20'Fast%20and%20Fit%20EA%20Over%20Trand'.%20The%20logo%20should%20convey%20speed%2C%20fitness%2C%20and%20f.jpeg" alt="FAF Logo" class="h-10 w-10 rounded-full border-2 border-white/20 object-cover shadow-sm">
+                    <span class="truncate">FAF Team (Fast and Fit EA)</span>
                 </div>
                 
-                <div class="flex space-x-2">
-                    <button onclick="switchTab('guide')" id="btn-guide" class="nav-btn active px-4 py-2 rounded-md text-sm font-medium transition">คู่มือติดตั้ง</button>
-                    <button onclick="switchTab('sim')" id="btn-sim" class="nav-btn px-4 py-2 rounded-md text-sm font-medium transition bg-slate-800 text-slate-300">จำลองการตั้งค่า</button>
+                <!-- MENU -->
+                <div class="flex w-full md:w-auto gap-2">
+                    <button onclick="switchTab('guide')" id="btn-guide" class="nav-btn active flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition border border-transparent text-center">คู่มือติดตั้ง</button>
+                    <button onclick="switchTab('sim')" id="btn-sim" class="nav-btn flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition bg-slate-800 text-slate-300 border border-slate-700 text-center">จำลองการตั้งค่า</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
+    <main class="max-w-7xl mx-auto px-4 py-6 md:py-8">
 
         <!-- VIEW 1: GUIDE (Installation Steps) -->
         <div id="view-guide" class="block animate-fade-in">
-            <div class="text-center mb-10">
-                <h1 class="text-3xl font-bold text-slate-900 mb-3">ขั้นตอนการติดตั้ง EA</h1>
-                <p class="text-slate-500">ทำตาม 4 ขั้นตอนง่ายๆ เพื่อเริ่มใช้งานระบบเทรดอัตโนมัติ</p>
+            <div class="text-center mb-8">
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2">ขั้นตอนการติดตั้ง EA</h1>
+                <p class="text-sm md:text-base text-slate-500">ทำตาม 4 ขั้นตอนง่ายๆ เพื่อเริ่มใช้งานระบบ</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <button onclick="setStep(1)" id="step-btn-1" class="p-4 rounded-lg bg-blue-50 border-2 border-blue-500 text-left transition hover:shadow-md">
-                    <span class="block text-xs font-bold text-blue-600 uppercase">Step 1</span>
-                    <span class="font-bold text-slate-800">ตั้งค่า Options</span>
+            <!-- Stepper Navigation (Responsive Grid) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <button onclick="setStep(1)" id="step-btn-1" class="p-3 rounded-lg bg-blue-50 border-2 border-blue-500 text-left transition shadow-sm">
+                    <span class="block text-[10px] font-bold text-blue-600 uppercase tracking-wider">Step 1</span>
+                    <span class="font-bold text-sm text-slate-800">ตั้งค่า Options</span>
                 </button>
-                <button onclick="setStep(2)" id="step-btn-2" class="p-4 rounded-lg bg-white border border-slate-200 text-left transition hover:shadow-md hover:border-blue-300">
-                    <span class="block text-xs font-bold text-slate-400 uppercase">Step 2</span>
-                    <span class="font-bold text-slate-600">ลงกราฟ</span>
+                <button onclick="setStep(2)" id="step-btn-2" class="p-3 rounded-lg bg-white border border-slate-200 text-left transition hover:border-blue-300 shadow-sm">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 2</span>
+                    <span class="font-bold text-sm text-slate-600">ลงกราฟ</span>
                 </button>
-                <button onclick="setStep(3)" id="step-btn-3" class="p-4 rounded-lg bg-white border border-slate-200 text-left transition hover:shadow-md hover:border-blue-300">
-                    <span class="block text-xs font-bold text-slate-400 uppercase">Step 3</span>
-                    <span class="font-bold text-slate-600">ตรวจสอบ Common</span>
+                <button onclick="setStep(3)" id="step-btn-3" class="p-3 rounded-lg bg-white border border-slate-200 text-left transition hover:border-blue-300 shadow-sm">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 3</span>
+                    <span class="font-bold text-sm text-slate-600">ตรวจ Common</span>
                 </button>
-                <button onclick="setStep(4)" id="step-btn-4" class="p-4 rounded-lg bg-white border border-slate-200 text-left transition hover:shadow-md hover:border-blue-300">
-                    <span class="block text-xs font-bold text-slate-400 uppercase">Step 4</span>
-                    <span class="font-bold text-slate-600">ตั้งค่า Input</span>
+                <button onclick="setStep(4)" id="step-btn-4" class="p-3 rounded-lg bg-white border border-slate-200 text-left transition hover:border-blue-300 shadow-sm">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Step 4</span>
+                    <span class="font-bold text-sm text-slate-600">ตั้งค่า Input</span>
                 </button>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 min-h-[400px]">
+            <!-- Content Container -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 md:p-8 min-h-[300px]">
                 
                 <!-- Step 1 Content -->
                 <div id="step-content-1" class="block">
-                    <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
                         <div class="flex-1 space-y-4">
-                            <h2 class="text-2xl font-bold text-slate-800">1. เปิดอนุญาตการเทรดอัตโนมัติ</h2>
-                            <p class="text-slate-600 leading-relaxed">
-                                ไปที่เมนู <strong>Tools -> Options</strong> (หรือกด Ctrl+O) <br>
-                                จากนั้นเลือกแท็บ <strong>Expert Advisors</strong> และติ๊กถูกช่องตามภาพจำลองด้านขวา
+                            <h2 class="text-xl font-bold text-slate-800">1. เปิดอนุญาตการเทรดอัตโนมัติ</h2>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                ไปที่เมนู <strong>Tools -> Options</strong> (หรือกด Ctrl+O) <br class="hidden md:block">
+                                จากนั้นเลือกแท็บ <strong>Expert Advisors</strong> และติ๊กถูกช่องตามภาพ
                             </p>
-                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-yellow-800">
-                                <strong>สำคัญ:</strong> หากไม่ติ๊กช่อง "Allow algorithmic trading" EA จะไม่สามารถส่งคำสั่งซื้อขายได้ (ไอคอนหมวกปริญญาจะเป็นสีเทา)
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded text-xs md:text-sm text-yellow-800">
+                                <strong>สำคัญ:</strong> หากไม่ติ๊กช่อง "Allow algorithmic trading" EA จะไม่สามารถทำงานได้
                             </div>
                         </div>
-                        <div class="flex-1 w-full flex justify-center">
+                        <div class="w-full lg:w-auto flex justify-center">
                             <!-- CSS Mockup: Options Window -->
-                            <div class="mt5-window w-full max-w-sm">
+                            <div class="mt5-window">
                                 <div class="mt5-header">
                                     <span>Options</span>
-                                    <span class="cursor-pointer">✕</span>
+                                    <span>✕</span>
                                 </div>
                                 <div class="mt5-body">
-                                    <div class="flex space-x-2 text-xs border-b pb-2 mb-3 text-slate-600">
+                                    <div class="flex space-x-2 text-xs border-b pb-2 mb-3 text-slate-600 overflow-x-auto">
                                         <span>Server</span> <span>Charts</span> <span class="text-blue-600 font-bold bg-blue-50 px-1 rounded">Expert Advisors</span> <span>Events</span>
                                     </div>
                                     <div class="space-y-2">
-                                        <label class="flex items-center space-x-2 p-2 bg-blue-50 border border-blue-200 rounded cursor-pointer">
+                                        <label class="flex items-center space-x-2 p-2 bg-blue-50 border border-blue-200 rounded">
                                             <input type="checkbox" checked class="accent-blue-600 w-4 h-4">
                                             <span class="font-bold text-sm">Allow algorithmic trading</span>
                                         </label>
                                         <div class="pl-6 space-y-1 opacity-60 text-xs">
-                                            <label class="flex items-center space-x-2"><input type="checkbox" checked disabled> <span>Disable... when account changed</span></label>
-                                            <label class="flex items-center space-x-2"><input type="checkbox" checked disabled> <span>Disable... when profile changed</span></label>
+                                            <label class="flex items-center space-x-2"><input type="checkbox" checked disabled> <span class="truncate">Disable... when account changed</span></label>
                                         </div>
                                     </div>
                                     <div class="flex justify-end gap-2 mt-4">
-                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs hover:bg-gray-300">OK</button>
-                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs hover:bg-gray-300">Cancel</button>
+                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs">OK</button>
+                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs">Cancel</button>
                                     </div>
                                 </div>
                             </div>
@@ -206,19 +221,18 @@
 
                 <!-- Step 2 Content -->
                 <div id="step-content-2" class="hidden">
-                    <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="flex flex-col lg:flex-row gap-6 items-center">
                         <div class="flex-1 space-y-4">
-                            <h2 class="text-2xl font-bold text-slate-800">2. ติดตั้ง EA ลงกราฟ</h2>
-                            <p class="text-slate-600">
-                                1. เปิดกราฟคู่เงินที่ต้องการเทรด (เช่น <strong>XAUUSD</strong>)<br>
-                                2. เปิดหน้าต่าง <strong>Navigator</strong> (Ctrl+N)<br>
-                                3. ลากไฟล์ EA ชื่อ <code>fastAndFit_Ea_Return</code> ลงไปในกราฟ
-                            </p>
+                            <h2 class="text-xl font-bold text-slate-800">2. ติดตั้ง EA ลงกราฟ</h2>
+                            <div class="text-slate-600 text-sm space-y-2">
+                                <p>1. เปิดกราฟคู่เงิน (เช่น <strong>XAUUSD</strong>)</p>
+                                <p>2. เปิดหน้าต่าง <strong>Navigator</strong> (Ctrl+N)</p>
+                                <p>3. ลากไฟล์ EA <code>fastAndFit_Ea_Return</code> ลงกราฟ</p>
+                            </div>
                         </div>
-                        <div class="flex-1 flex justify-center">
-                            <div class="relative w-64 h-48 bg-slate-800 rounded border-2 border-slate-600 flex items-center justify-center overflow-hidden">
+                        <div class="w-full lg:w-auto flex justify-center">
+                            <div class="relative w-full max-w-[300px] h-48 bg-slate-800 rounded border-2 border-slate-600 flex items-center justify-center overflow-hidden">
                                 <span class="absolute top-2 left-2 text-xs text-slate-400">XAUUSD, H1</span>
-                                <!-- Simulated Drag -->
                                 <div class="absolute inset-0 flex items-center justify-center bg-black/20">
                                     <div class="bg-white px-4 py-2 rounded shadow-lg border border-slate-300 flex items-center gap-2 animate-bounce">
                                         <span class="text-xl">🎓</span>
@@ -233,19 +247,18 @@
 
                 <!-- Step 3 Content -->
                 <div id="step-content-3" class="hidden">
-                    <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
                         <div class="flex-1 space-y-4">
-                            <h2 class="text-2xl font-bold text-slate-800">3. ตรวจสอบแท็บ Common</h2>
-                            <p class="text-slate-600">
-                                เมื่อลาก EA ลงกราฟ จะมีหน้าต่างเด้งขึ้นมา ให้คลิกที่แท็บ <strong>Common</strong> <br>
-                                และตรวจสอบให้แน่ใจว่าติ๊กถูกที่ช่อง <strong>Allow Algo Trading</strong>
+                            <h2 class="text-xl font-bold text-slate-800">3. ตรวจสอบแท็บ Common</h2>
+                            <p class="text-slate-600 text-sm">
+                                เมื่อลาก EA ลงกราฟ จะมีหน้าต่างเด้งขึ้นมา <br>
+                                คลิกแท็บ <strong>Common</strong> และติ๊ก <strong>Allow Algo Trading</strong>
                             </p>
                         </div>
-                        <div class="flex-1 flex justify-center">
-                            <!-- CSS Mockup: EA Properties -->
-                            <div class="mt5-window w-full max-w-sm">
+                        <div class="w-full lg:w-auto flex justify-center">
+                            <div class="mt5-window">
                                 <div class="mt5-header">
-                                    <span>fastAndFit_Ea_Return 1.00</span>
+                                    <span class="truncate">fastAndFit_Ea_Return 1.00</span>
                                     <span>✕</span>
                                 </div>
                                 <div class="mt5-body">
@@ -256,8 +269,8 @@
                                     <div class="flex items-center gap-3 mb-4">
                                         <div class="text-3xl text-blue-600">🎓</div>
                                         <div>
-                                            <div class="font-bold text-sm">fastAndFit_Ea_Return</div>
-                                            <div class="text-xs text-gray-500">Copyright 2025, MetaQuotes Ltd.</div>
+                                            <div class="font-bold text-sm">fastAndFit_Ea...</div>
+                                            <div class="text-xs text-gray-500">MetaQuotes Ltd.</div>
                                         </div>
                                     </div>
                                     <div class="border-t pt-3">
@@ -267,8 +280,8 @@
                                         </label>
                                     </div>
                                     <div class="flex justify-end gap-2 mt-6">
-                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs hover:bg-gray-300">OK</button>
-                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs hover:bg-gray-300">Cancel</button>
+                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs">OK</button>
+                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs">Cancel</button>
                                     </div>
                                 </div>
                             </div>
@@ -276,73 +289,49 @@
                     </div>
                 </div>
 
-                <!-- Step 4 Content (Updated with CSS Mockup) -->
+                <!-- Step 4 Content -->
                 <div id="step-content-4" class="hidden">
-                    <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
                         <div class="flex-1 space-y-4">
-                            <h2 class="text-2xl font-bold text-slate-800">4. ตั้งค่า Inputs</h2>
-                            <p class="text-slate-600 mb-4">
-                                ขั้นตอนสุดท้ายคือการตั้งค่าในแท็บ <strong>Inputs</strong> <br>
-                                ให้กรอกค่าตามความเหมาะสมของเงินทุน (ดูภาพจำลองด้านขวา)
+                            <h2 class="text-xl font-bold text-slate-800">4. ตั้งค่า Inputs</h2>
+                            <p class="text-slate-600 text-sm mb-4">
+                                ตั้งค่าความเสี่ยงในแท็บ <strong>Inputs</strong> <br>
+                                โดยสามารถทดลองคำนวณค่าที่เหมาะสมได้ที่หน้า Simulator
                             </p>
-                            <button onclick="switchTab('sim')" class="bg-blue-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-blue-700 hover:scale-105 transition transform flex items-center gap-2">
+                            <button onclick="switchTab('sim')" class="w-full md:w-auto bg-blue-600 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-blue-700 active:scale-95 transition transform flex items-center justify-center gap-2">
                                 <span>🚀</span> ไปที่เครื่องมือจำลอง (Simulator)
                             </button>
                         </div>
-                        <div class="flex-1 flex justify-center">
-                            <!-- CSS Mockup: Inputs Window (Recreated from image) -->
+                        <div class="w-full lg:w-auto flex justify-center">
+                            <!-- CSS Mockup: Inputs Window -->
                             <div class="mt5-window w-full max-w-md mx-auto">
                                 <div class="mt5-header">
-                                    <span>fastAndFit_Ea_Return 1.00 (XAUUSDm,M1)</span>
-                                    <span class="cursor-pointer">✕</span>
+                                    <span class="truncate">fastAndFit_Ea... (XAUUSDm)</span>
+                                    <span>✕</span>
                                 </div>
                                 <div class="mt5-body">
                                     <div class="flex space-x-4 text-xs border-b pb-2 mb-3">
-                                        <span class="text-slate-500 cursor-pointer">Common</span>
-                                        <span class="font-bold text-blue-700 border-b-2 border-blue-700 pb-1 cursor-pointer">Inputs</span>
+                                        <span class="text-slate-500">Common</span>
+                                        <span class="font-bold text-blue-700 border-b-2 border-blue-700 pb-1">Inputs</span>
                                     </div>
                                     
-                                    <!-- Table Mockup -->
                                     <div class="border border-gray-300 bg-white h-48 overflow-y-auto custom-scrollbar relative">
-                                        <table class="mt5-table w-full">
+                                        <table class="mt5-table">
                                             <thead class="sticky top-0 bg-gray-100 z-10 shadow-sm">
-                                                <tr>
-                                                    <th class="w-2/3">Variable</th>
-                                                    <th class="w-1/3">Value</th>
-                                                </tr>
+                                                <tr><th class="w-2/3">Variable</th><th class="w-1/3">Value</th></tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td><span class="mt5-icon-ab">ab</span> ชื่อคู่เงินที่จะเทรด >></td>
-                                                    <td>XAUUSDm</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span class="mt5-icon-num">1/2</span> ค่า Lot Size เริ่มต้น >></td>
-                                                    <td>0.01</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span class="mt5-icon-num">1/2</span> ค่า Lot Size ที่เพิ่มขึ้นเมื่อ Loss แต่ละครั้ง >></td>
-                                                    <td>0.01</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span class="mt5-icon-num">1/2</span> หยุดโปรแกรมและปิด Order ทั้งหมดเมื่อ เงินในบัญชีเหลือน้อยกว่า ></td>
-                                                    <td>9999999.0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span class="mt5-icon-num">1/2</span> เพิ่ม Lot Size ได้มากที่สุดถึง >></td>
-                                                    <td>9999.0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span class="mt5-icon-num">1/2</span> เพิ่มจำนวนไม้ได้มากที่สุดถึง >></td>
-                                                    <td>9999.0</td>
-                                                </tr>
+                                                <tr><td><span class="mt5-icon-ab">ab</span> ชื่อคู่เงินที่จะเทรด >></td><td>XAUUSDm</td></tr>
+                                                <tr><td><span class="mt5-icon-num">1/2</span> ค่า Lot Size เริ่มต้น >></td><td>0.01</td></tr>
+                                                <tr><td><span class="mt5-icon-num">1/2</span> ค่า Lot Size เพิ่มขึ้น...</td><td>0.01</td></tr>
+                                                <tr><td><span class="mt5-icon-num">1/2</span> หยุดโปรแกรมเมื่อ...</td><td>99999...</td></tr>
+                                                <tr><td><span class="mt5-icon-num">1/2</span> เพิ่ม Lot มากสุด...</td><td>9999.0</td></tr>
                                             </tbody>
                                         </table>
                                     </div>
-
                                     <div class="flex justify-end gap-2 mt-4">
-                                        <button class="px-4 py-1 bg-gray-200 border border-gray-300 rounded text-xs hover:bg-gray-300 shadow-sm">OK</button>
-                                        <button class="px-4 py-1 bg-gray-200 border border-gray-300 rounded text-xs hover:bg-gray-300 shadow-sm">Cancel</button>
+                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs">OK</button>
+                                        <button class="px-3 py-1 bg-gray-200 border rounded text-xs">Cancel</button>
                                     </div>
                                 </div>
                             </div>
@@ -355,129 +344,132 @@
 
         <!-- VIEW 2: SIMULATOR -->
         <div id="view-sim" class="hidden animate-fade-in">
-            <div class="mb-6 flex flex-col md:flex-row justify-between items-end">
-                <div>
-                    <h1 class="text-3xl font-bold text-slate-900">EA Input Simulator</h1>
-                    <p class="text-slate-500">ทดลองปรับค่า Parameter เพื่อดูผลลัพธ์ก่อนตั้งค่าจริง</p>
-                </div>
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-slate-900">EA Input Simulator</h1>
+                <p class="text-sm text-slate-500">ทดลองปรับค่า Parameter เพื่อดูผลลัพธ์</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
                 <!-- INPUT PANEL -->
-                <div class="lg:col-span-4 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                    <div class="bg-slate-100 px-6 py-4 border-b border-slate-200 font-bold text-slate-700 flex items-center gap-2">
+                <div class="lg:col-span-5 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden order-2 lg:order-1">
+                    <div class="bg-slate-100 px-5 py-3 border-b border-slate-200 font-bold text-slate-700 flex items-center gap-2">
                         <span>🎛</span> ตั้งค่าพารามิเตอร์ (Inputs)
                     </div>
                     
-                    <!-- Added Reference Mockup for Simulator -->
+                    <!-- Reference Image -->
                     <div class="bg-slate-50 p-4 border-b border-slate-100 text-center">
                         <p class="text-xs text-slate-500 mb-2">ตัวอย่างหน้าต่าง Inputs ของจริง</p>
-                        <!-- Updated Image Source -->
-                        <img src="https://raw.githubusercontent.com/maxghmain/FastAndFitEA/refs/heads/main/image.png" alt="MT5 Inputs Real" class="mx-auto rounded border border-slate-200 shadow-sm max-h-40 object-contain hover:scale-110 transition-transform cursor-pointer">
+                        <img src="https://raw.githubusercontent.com/maxghmain/FastAndFitEA/refs/heads/main/image.png" alt="MT5 Inputs Real" class="mx-auto rounded border border-slate-200 shadow-sm max-h-32 object-contain">
                     </div>
 
-                    <div class="p-6 space-y-4">
+                    <div class="p-4 md:p-6 space-y-4">
                         
-                        <!-- Capital (Extra for Sim) -->
-                        <div class="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-100">
+                        <!-- Capital Input -->
+                        <div class="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-100 shadow-sm">
                             <label class="block text-xs font-bold text-blue-800 mb-1">💰 จำลองเงินทุนในพอร์ต (Balance)</label>
-                            <input type="number" id="inp-capital" value="1000" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white text-right font-mono" oninput="updateSim()">
+                            <input type="number" id="inp-capital" value="1000" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white text-right font-mono text-lg font-bold text-slate-700" oninput="updateSim()">
                         </div>
 
-                        <!-- MT5 Style Inputs -->
+                        <!-- MT5 Style Inputs Wrapper -->
                         <div class="space-y-0 border-t border-slate-200">
                             
-                            <!-- 1. Currency & 2. Start Lot -->
+                            <!-- 1. Currency -->
                             <div class="sim-input-row">
                                 <div class="sim-input-label flex items-center">
                                     <span class="mt5-icon-ab">ab</span> ชื่อคู่เงินที่จะเทรด >>
                                 </div>
-                                <div class="sim-input-field text-right text-xs text-gray-500">
+                                <div class="sim-input-field text-right text-xs text-gray-500 font-mono">
                                     XAUUSDm
                                 </div>
                             </div>
+
+                            <!-- 2. Start Lot -->
                             <div class="sim-input-row">
                                 <div class="sim-input-label flex items-center">
                                     <span class="mt5-icon-num">1/2</span> ค่า Lot Size เริ่มต้น >>
                                 </div>
                                 <div class="sim-input-field">
-                                    <input type="number" step="0.01" id="inp-start-lot" value="0.01" class="w-full border p-1 rounded text-right text-xs" oninput="updateSim()">
+                                    <input type="number" step="0.01" id="inp-start-lot" value="0.01" class="w-full border border-slate-300 p-2 rounded text-right text-sm focus:border-blue-500 outline-none" oninput="updateSim()">
                                 </div>
                             </div>
+                            
                             <!-- Explainer 5.1 -->
                             <div class="info-box">
                                 <span class="info-title">5.1) ชื่อคู่เงิน & Lot Size เริ่มต้น</span>
-                                ให้ใส่ชื่อค่าคู่เงินของ โบรกนั้นๆที่จะเทรด เช่น XAUUSDm<br>
-                                <strong>Lot Size เริ่มต้น:</strong> แนะนำที่ทุน <strong>1000 : 0.01</strong>
+                                แนะนำที่ทุน <strong>1000 : 0.01</strong>
                             </div>
 
                             <!-- 3. Lot Step -->
                             <div class="sim-input-row">
                                 <div class="sim-input-label flex items-center">
-                                    <span class="mt5-icon-num">1/2</span> ค่า Lot Size ที่เพิ่มขึ้นเมื่อ Loss แต่ละครั้ง >>
+                                    <span class="mt5-icon-num">1/2</span> ค่า Lot Size เพิ่มขึ้นเมื่อ Loss >>
                                 </div>
                                 <div class="sim-input-field">
-                                    <input type="number" step="0.01" id="inp-lot-step" value="0.01" class="w-full border p-1 rounded text-right text-xs" oninput="updateSim()">
+                                    <input type="number" step="0.01" id="inp-lot-step" value="0.01" class="w-full border border-slate-300 p-2 rounded text-right text-sm focus:border-blue-500 outline-none" oninput="updateSim()">
                                 </div>
                             </div>
-                            <p id="warning-step" class="hidden text-[10px] text-red-500 text-right bg-red-50 p-1 rounded mb-2">⚠️ ควรตั้งเท่ากับ Lot เริ่มต้น</p>
+                            <p id="warning-step" class="hidden text-xs text-red-500 text-right bg-red-50 p-2 rounded mb-2 font-bold">⚠️ ควรตั้งเท่ากับ Lot เริ่มต้น</p>
+                            
                             <!-- Explainer 5.2 -->
                             <div class="info-box">
-                                <span class="info-title">5.2) ค่า Lot Size ที่เพิ่มขึ้น (Step)</span>
-                                ให้ตั้งตาม Lot Size เริ่มต้น หากเริ่มต้น 0.5 ค่านี้ก็ต้อง 0.5 ด้วย เป็นระบบสำหรับนำทุนคืน
+                                <span class="info-title">5.2) ค่า Lot Step</span>
+                                ตั้งเท่ากับ Lot เริ่มต้น (เช่น เริ่ม 0.01 ก็ใส่ 0.01) เพื่อใช้ระบบคืนทุน
                             </div>
 
                             <!-- 4. Stop Program (Safety) -->
-                            <div class="sim-input-row flex-col items-stretch !items-start">
-                                <div class="sim-input-label flex items-center w-full mb-1">
-                                    <span class="mt5-icon-num">1/2</span> หยุดโปรแกรมและปิด Order ทั้งหมดเมื่อ เงินในบัญชีเหลือน้อยกว่า >
+                            <div class="sim-input-row !flex-col !items-start gap-2">
+                                <div class="sim-input-label flex items-center w-full">
+                                    <span class="mt5-icon-num">1/2</span> หยุดโปรแกรมเมื่อเงินเหลือ >
                                 </div>
-                                <div class="flex items-center justify-between w-full bg-slate-50 p-2 rounded border border-slate-100">
-                                    <div class="flex-1 mr-2">
-                                        <input type="range" id="inp-safety" min="10" max="90" value="30" class="w-full h-1 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-600" oninput="updateSim()">
-                                        <div class="text-[10px] text-slate-500">เหลือทุนไว้ <span id="txt-safety-pct" class="font-bold text-blue-600">30%</span></div>
+                                <div class="flex items-center justify-between w-full bg-slate-50 p-3 rounded border border-slate-200">
+                                    <div class="flex-1 mr-4">
+                                        <input type="range" id="inp-safety" min="10" max="90" value="30" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-600" oninput="updateSim()">
+                                        <div class="text-xs text-slate-500 mt-1">เหลือทุนไว้ <span id="txt-safety-pct" class="font-bold text-blue-600">30%</span></div>
                                     </div>
-                                    <div class="text-xs font-bold text-slate-700 bg-white border px-2 py-1 rounded" id="txt-stopout-display">
+                                    <div class="text-sm font-bold text-slate-800 bg-white border border-slate-300 px-3 py-1 rounded min-w-[70px] text-center" id="txt-stopout-display">
                                         300.0
                                     </div>
                                 </div>
                             </div>
+                            
                             <!-- Explainer 5.3 -->
                             <div class="info-box">
                                 <span class="info-title">5.3) Safety เงินทุน (Stop Out)</span>
-                                ถ้าเงินไหลหรือติดดอย เหลือเท่าไหร่ถึงจะหยุดโปรแกรม (เช่น เหลือ 1 จาก 1000) ตั้งค่าตามความเสี่ยงที่รับไหว แต่แนะนำให้เหลือ <strong>30%</strong> ของเงินทุนเผื่อเหตุการณ์ไม่คาดฝัน (เช่น ทุน 1000 เหลือไว้ 300)
+                                เหลือเท่าไหร่ถึงจะหยุด แนะนำ <strong>30%</strong> ของทุน (เช่น ทุน 1000 เหลือ 300) เผื่อเหตุฉุกเฉิน
                             </div>
 
                             <!-- 5. Max Lot -->
                             <div class="sim-input-row">
                                 <div class="sim-input-label flex items-center">
-                                    <span class="mt5-icon-num">1/2</span> เพิ่ม Lot Size ได้มากที่สุดถึง >>
+                                    <span class="mt5-icon-num">1/2</span> เพิ่ม Lot Size มากสุดถึง >>
                                 </div>
                                 <div class="sim-input-field">
-                                    <input type="number" step="0.01" id="inp-max-lot" value="0.03" class="w-full border p-1 rounded text-right text-xs" oninput="updateSim()">
+                                    <input type="number" step="0.01" id="inp-max-lot" value="0.03" class="w-full border border-slate-300 p-2 rounded text-right text-sm focus:border-blue-500 outline-none" oninput="updateSim()">
                                 </div>
                             </div>
+                            
                             <!-- Explainer 5.4 -->
                             <div class="info-box">
-                                <span class="info-title">5.4) เพิ่ม Lot Size ได้มากที่สุด</span>
-                                คือเพดานการทบไม้ (Martingale) เช่น ถ้าคำนวณได้ 0.05 แต่เราตั้ง Max ไว้ 0.03 ระบบจะออกแค่ 0.03<br>
-                                <em>ข้อควรระวัง:</em> หากจำกัดไว้ต่ำเกินไป อาจทำให้ระบบคืนทุนช้าลงหรือเพี้ยนได้ แนะนำให้ใช้ค่า Default หรือตามความเหมาะสม
+                                <span class="info-title">5.4) Max Lot Size</span>
+                                เพดานการทบไม้ เช่น คำนวณได้ 0.05 แต่ตั้ง Max 0.03 ระบบจะออกแค่ 0.03 <br>
+                                <em>ระวัง:</em> ถ้าน้อยไป อาจคืนทุนช้า
                             </div>
 
                             <!-- 6. Max Orders -->
                             <div class="sim-input-row">
                                 <div class="sim-input-label flex items-center">
-                                    <span class="mt5-icon-num">1/2</span> เพิ่มจำนวนไม้ได้มากที่สุดถึง >>
+                                    <span class="mt5-icon-num">1/2</span> เพิ่มจำนวนไม้มากสุดถึง >>
                                 </div>
                                 <div class="sim-input-field">
-                                    <input type="number" id="inp-max-orders" value="5" class="w-full border p-1 rounded text-right text-xs" oninput="updateSim()">
+                                    <input type="number" id="inp-max-orders" value="5" class="w-full border border-slate-300 p-2 rounded text-right text-sm focus:border-blue-500 outline-none" oninput="updateSim()">
                                 </div>
                             </div>
+                            
                             <!-- Explainer 5.5 -->
                             <div class="info-box">
-                                <span class="info-title">5.5) เพิ่มจำนวนไม้ได้มากที่สุด</span>
-                                จำนวนไม้สูงสุดที่จะเปิดแก้เกม (เช่น แพ้แล้วเปิดเพิ่มเรื่อยๆ) ลูกค้าปรับได้ตามต้องการ เช่น ไม่ต้องการให้ออกไม้ที่ 4 ก็ตั้งจำกัดไว้ แต่จะมีผลต่อระยะเวลาคืนทุนหากมีการขาดทุน
+                                <span class="info-title">5.5) Max Orders</span>
+                                จำนวนไม้สูงสุดที่จะเปิดแก้เกม ปรับได้ตามความเสี่ยงที่รับไหว
                             </div>
 
                         </div>
@@ -485,48 +477,50 @@
                 </div>
 
                 <!-- CHARTS PANEL -->
-                <div class="lg:col-span-8 space-y-6">
+                <div class="lg:col-span-7 space-y-6 order-1 lg:order-2">
                     
                     <!-- Safety Chart -->
-                    <div class="bg-white rounded-xl shadow-md p-6 border border-slate-100">
-                        <h3 class="text-lg font-bold text-slate-800 mb-2">📊 วิเคราะห์ความปลอดภัย (Safety Analysis)</h3>
-                        <p class="text-sm text-slate-500 mb-4">แสดงสัดส่วนเงินทุนที่จะถูกรักษาไว้ (สีแดง) vs เงินทุนที่นำไปเสี่ยงเทรดได้ (สีเขียว)</p>
+                    <div class="bg-white rounded-xl shadow-md p-5 border border-slate-100">
+                        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-2">📊 วิเคราะห์ความปลอดภัย</h3>
                         
-                        <div class="flex flex-col md:flex-row items-center gap-6">
-                            <div class="w-48 h-48 flex-shrink-0">
+                        <div class="flex flex-col sm:flex-row items-center gap-6">
+                            <div class="w-40 h-40 flex-shrink-0 relative">
                                 <canvas id="safetyChart"></canvas>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <span class="text-xs font-bold text-slate-400">Capital</span>
+                                </div>
                             </div>
                             <div class="flex-1 space-y-3 w-full">
                                 <div class="bg-green-50 p-3 rounded-lg border-l-4 border-green-500 flex justify-between items-center">
                                     <div>
-                                        <div class="text-xs text-green-800 uppercase font-bold">Risk Capital (เทรดได้)</div>
-                                        <div class="text-sm text-green-700">ส่วนที่ใช้ทำกำไรและแก้ไม้</div>
+                                        <div class="text-[10px] md:text-xs text-green-800 uppercase font-bold">Risk Capital (เทรดได้)</div>
+                                        <div class="text-xs md:text-sm text-green-700">ส่วนทำกำไร/แก้ไม้</div>
                                     </div>
-                                    <div class="text-xl font-bold text-green-700" id="val-risk">$700</div>
+                                    <div class="text-lg md:text-xl font-bold text-green-700" id="val-risk">$700</div>
                                 </div>
                                 <div class="bg-red-50 p-3 rounded-lg border-l-4 border-red-500 flex justify-between items-center">
                                     <div>
-                                        <div class="text-xs text-red-800 uppercase font-bold">Safety Guard (หยุดเทรด)</div>
-                                        <div class="text-sm text-red-700">ส่วนที่จะเหลือเมื่อล้างพอร์ต</div>
+                                        <div class="text-[10px] md:text-xs text-red-800 uppercase font-bold">Safety Guard (หยุดเทรด)</div>
+                                        <div class="text-xs md:text-sm text-red-700">ส่วนที่เหลือเมื่อหยุด</div>
                                     </div>
-                                    <div class="text-xl font-bold text-red-700" id="val-safe">$300</div>
+                                    <div class="text-lg md:text-xl font-bold text-red-700" id="val-safe">$300</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Lot Chart -->
-                    <div class="bg-white rounded-xl shadow-md p-6 border border-slate-100">
-                        <h3 class="text-lg font-bold text-slate-800 mb-2">📈 จำลองการออกไม้ (Martingale Step)</h3>
-                        <p class="text-sm text-slate-500 mb-4">กราฟแสดงขนาด Lot ที่จะออกจริงในแต่ละไม้ (เปรียบเทียบกับ Max Lot ที่ตั้งไว้)</p>
+                    <div class="bg-white rounded-xl shadow-md p-5 border border-slate-100">
+                        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-2">📈 จำลองการออกไม้ (Martingale)</h3>
+                        <p class="text-xs md:text-sm text-slate-500 mb-4">กราฟแสดงขนาด Lot จริงในแต่ละไม้ เทียบกับ Max Lot</p>
                         
                         <div class="chart-container">
                             <canvas id="lotChart"></canvas>
                         </div>
                         
-                        <div class="mt-4 p-3 bg-blue-50 rounded text-sm text-blue-800 flex items-start gap-2">
+                        <div class="mt-4 p-3 bg-blue-50 rounded text-xs md:text-sm text-blue-800 flex items-start gap-2">
                             <span class="text-lg">💡</span>
-                            <span id="lot-insight">Max Lot Size ถูกจำกัดไว้ที่ 0.03 ทำให้ไม้ที่ 4 และ 5 ไม่เพิ่ม Lot ซึ่งอาจทำให้การคืนทุนช้าลงเล็กน้อย แต่ปลอดภัยกว่า</span>
+                            <span id="lot-insight">Max Lot Size ถูกจำกัดไว้...</span>
                         </div>
                     </div>
 
@@ -537,44 +531,52 @@
     </main>
 
     <script>
-        // --- Navigation ---
+        // --- Navigation Logic ---
         function switchTab(tab) {
             document.getElementById('view-guide').classList.add('hidden');
             document.getElementById('view-sim').classList.add('hidden');
             
-            document.getElementById('btn-guide').classList.remove('active');
-            document.getElementById('btn-guide').classList.add('bg-slate-800', 'text-slate-300'); // Inactive style
-            document.getElementById('btn-sim').classList.remove('active');
-            document.getElementById('btn-sim').classList.add('bg-slate-800', 'text-slate-300'); // Inactive style
+            document.getElementById('btn-guide').classList.remove('active', 'bg-blue-600', 'text-white');
+            document.getElementById('btn-guide').classList.add('text-slate-200'); // Inactive text color fixed
+            
+            document.getElementById('btn-sim').classList.remove('active', 'bg-blue-600', 'text-white');
+            
+            // Reset base styles
+            document.getElementById('btn-guide').className = "nav-btn flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition border border-transparent text-center text-slate-300 hover:text-white";
+            document.getElementById('btn-sim').className = "nav-btn flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition bg-slate-800 text-slate-300 border border-slate-700 text-center hover:text-white";
 
             if (tab === 'guide') {
                 document.getElementById('view-guide').classList.remove('hidden');
                 document.getElementById('btn-guide').classList.add('active');
-                document.getElementById('btn-guide').classList.remove('bg-slate-800', 'text-slate-300');
             } else {
                 document.getElementById('view-sim').classList.remove('hidden');
                 document.getElementById('btn-sim').classList.add('active');
-                document.getElementById('btn-sim').classList.remove('bg-slate-800', 'text-slate-300');
-                updateSim(); // Force update charts
+                updateSim(); 
+                
+                // Resize charts slightly after tab switch to ensure fit
+                if(safetyChart) safetyChart.resize();
+                if(lotChart) lotChart.resize();
             }
+            window.scrollTo(0,0);
         }
 
         function setStep(step) {
-            // Update buttons
             for(let i=1; i<=4; i++) {
                 const btn = document.getElementById(`step-btn-${i}`);
                 const content = document.getElementById(`step-content-${i}`);
                 
+                // Reset styles
+                btn.className = "p-3 rounded-lg bg-white border border-slate-200 text-left transition hover:border-blue-300 shadow-sm";
+                btn.querySelector('span:first-child').className = "block text-[10px] font-bold text-slate-400 uppercase tracking-wider";
+                btn.querySelector('span:last-child').className = "font-bold text-sm text-slate-600";
+                content.classList.add('hidden');
+
                 if(i === step) {
-                    btn.classList.remove('bg-white', 'border-slate-200');
-                    btn.classList.add('bg-blue-50', 'border-2', 'border-blue-500');
-                    btn.querySelector('span:first-child').classList.replace('text-slate-400', 'text-blue-600');
+                    // Active Styles
+                    btn.className = "p-3 rounded-lg bg-blue-50 border-2 border-blue-500 text-left transition shadow-sm transform scale-[1.02]";
+                    btn.querySelector('span:first-child').className = "block text-[10px] font-bold text-blue-600 uppercase tracking-wider";
+                    btn.querySelector('span:last-child').className = "font-bold text-sm text-slate-800";
                     content.classList.remove('hidden');
-                } else {
-                    btn.classList.add('bg-white', 'border-slate-200');
-                    btn.classList.remove('bg-blue-50', 'border-2', 'border-blue-500');
-                    btn.querySelector('span:first-child').classList.replace('text-blue-600', 'text-slate-400');
-                    content.classList.add('hidden');
                 }
             }
         }
@@ -644,9 +646,7 @@
             const safeVal = Math.round(capital * (safetyPct / 100));
             const riskVal = capital - safeVal;
             
-            // Update the display in the mockup input
             document.getElementById('txt-stopout-display').innerText = safeVal.toFixed(1);
-
             document.getElementById('val-safe').innerText = '$' + safeVal;
             document.getElementById('val-risk').innerText = '$' + riskVal;
 
@@ -673,12 +673,8 @@
             for(let i=1; i<=maxOrders; i++) {
                 labels.push(`Order ${i}`);
                 
-                // Formula from manual: "Start 0.01, Step 0.01... if lose #1, next is 0.02" -> Additive
-                // Order 1: Start
-                // Order 2: Start + Step
-                // Order 3: Start + Step*2
                 let rawLot = startLot + (lotStep * (i - 1));
-                rawLot = Math.round(rawLot * 100) / 100; // Fix floating point
+                rawLot = Math.round(rawLot * 100) / 100;
 
                 let actual = rawLot;
                 let capped = 0;
@@ -696,13 +692,11 @@
             // Update Insight Text
             const insight = document.getElementById('lot-insight');
             if(hitMax) {
-                insight.innerHTML = `⚠️ <strong>มีการติด Max Lot (${maxLot}):</strong> กราฟสีเทาแสดงส่วนต่างที่ระบบ *ควรจะออก* แต่ถูกจำกัดไว้ อาจทำให้การคืนทุนช้าลง`;
-                insight.parentElement.classList.replace('bg-blue-50', 'bg-yellow-50');
-                insight.parentElement.classList.replace('text-blue-800', 'text-yellow-800');
+                insight.innerHTML = `⚠️ <strong>ติด Max Lot (${maxLot}):</strong> กราฟสีเทาคือส่วนที่ควรจะออกแต่ถูกจำกัดไว้`;
+                insight.parentElement.className = "mt-4 p-3 bg-yellow-50 rounded text-xs md:text-sm text-yellow-800 flex items-start gap-2 border border-yellow-100";
             } else {
-                insight.innerHTML = `✅ <strong>ปกติ:</strong> การออกไม้เพิ่มขึ้นตาม Step และยังไม่ชนเพดาน Max Lot (${maxLot})`;
-                insight.parentElement.classList.replace('bg-yellow-50', 'bg-blue-50');
-                insight.parentElement.classList.replace('text-yellow-800', 'text-blue-800');
+                insight.innerHTML = `✅ <strong>ปกติ:</strong> ยังไม่ชนเพดาน Max Lot (${maxLot})`;
+                insight.parentElement.className = "mt-4 p-3 bg-blue-50 rounded text-xs md:text-sm text-blue-800 flex items-start gap-2 border border-blue-100";
             }
 
             // Update Lot Chart
