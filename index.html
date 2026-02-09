@@ -71,6 +71,43 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Sim Input Styles to match MT5 */
+        .sim-input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .sim-input-label {
+            font-family: 'Tahoma', sans-serif;
+            font-size: 12px;
+            color: #333;
+            flex: 1;
+            padding-right: 8px;
+        }
+        .sim-input-field {
+            width: 100px;
+        }
+        
+        /* Info box style for explanations */
+        .info-box {
+            font-size: 11px;
+            color: #475569;
+            background-color: #f1f5f9;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            border-left: 3px solid #cbd5e1;
+            line-height: 1.5;
+        }
+        .info-title {
+            font-weight: bold;
+            color: #334155;
+            display: block;
+            margin-bottom: 2px;
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -288,7 +325,7 @@
                                                     <td>0.01</td>
                                                 </tr>
                                                 <tr>
-                                                    <td><span class="mt5-icon-num">1/2</span> หยุดโปรแกรมและปิด Order ทั้งหมดเมื่อ...</td>
+                                                    <td><span class="mt5-icon-num">1/2</span> หยุดโปรแกรมและปิด Order ทั้งหมดเมื่อ เงินในบัญชีเหลือน้อยกว่า ></td>
                                                     <td>9999999.0</td>
                                                 </tr>
                                                 <tr>
@@ -336,89 +373,114 @@
                     <!-- Added Reference Mockup for Simulator -->
                     <div class="bg-slate-50 p-4 border-b border-slate-100 text-center">
                         <p class="text-xs text-slate-500 mb-2">ตัวอย่างหน้าต่าง Inputs ของจริง</p>
-                        <!-- CSS Mockup: Inputs Window Small -->
-                        <div class="mt5-window w-full mx-auto transform scale-90 origin-top">
-                            <div class="mt5-header">
-                                <span class="text-[10px]">fastAndFit... (XAUUSDm)</span>
-                                <span class="text-[10px]">✕</span>
-                            </div>
-                            <div class="mt5-body p-2">
-                                <div class="flex space-x-2 text-[10px] border-b pb-1 mb-1">
-                                    <span class="text-slate-500">Common</span>
-                                    <span class="font-bold text-blue-700 border-b border-blue-700">Inputs</span>
-                                </div>
-                                <div class="border border-gray-300 bg-white h-24 overflow-hidden relative text-[9px]">
-                                    <table class="mt5-table w-full">
-                                        <thead class="bg-gray-100">
-                                            <tr><th class="p-0 pl-1">Variable</th><th class="p-0 pl-1">Value</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr><td><span class="mt5-icon-ab">ab</span> ชื่อคู่เงิน...</td><td>XAUUSDm</td></tr>
-                                            <tr><td><span class="mt5-icon-num">1/2</span> ค่า Lot Size...</td><td>0.01</td></tr>
-                                            <tr><td><span class="mt5-icon-num">1/2</span> ค่า Lot Size...</td><td>0.01</td></tr>
-                                            <tr><td><span class="mt5-icon-num">1/2</span> หยุดโปรแกรม...</td><td>999...</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Updated Image Source -->
+                        <img src="https://raw.githubusercontent.com/maxghmain/FastAndFitEA/refs/heads/main/image.png" alt="MT5 Inputs Real" class="mx-auto rounded border border-slate-200 shadow-sm max-h-40 object-contain hover:scale-110 transition-transform cursor-pointer">
                     </div>
 
-                    <div class="p-6 space-y-6">
+                    <div class="p-6 space-y-4">
                         
-                        <!-- 5.1 -->
-                        <div class="space-y-2">
-                            <h3 class="text-xs font-bold text-blue-600 uppercase tracking-wider">5.1 ทุน & Lot เริ่มต้น</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-600 mb-1">เงินทุน ($)</label>
-                                    <input type="number" id="inp-capital" value="1000" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="updateSim()">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Lot เริ่มต้น</label>
-                                    <input type="number" step="0.01" id="inp-start-lot" value="0.01" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="updateSim()">
-                                </div>
-                            </div>
+                        <!-- Capital (Extra for Sim) -->
+                        <div class="bg-blue-50 p-3 rounded-lg mb-4 border border-blue-100">
+                            <label class="block text-xs font-bold text-blue-800 mb-1">💰 จำลองเงินทุนในพอร์ต (Balance)</label>
+                            <input type="number" id="inp-capital" value="1000" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white text-right font-mono" oninput="updateSim()">
                         </div>
 
-                        <!-- 5.2 -->
-                        <div class="space-y-2 pt-4 border-t border-dashed">
-                            <h3 class="text-xs font-bold text-blue-600 uppercase tracking-wider">5.2 การแก้ไม้ (Recovery)</h3>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Lot Step (เพิ่มทีละ)</label>
-                                <input type="number" step="0.01" id="inp-lot-step" value="0.01" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="updateSim()">
-                                <p id="warning-step" class="hidden text-xs text-red-500 mt-1 bg-red-50 p-1 rounded">⚠️ ควรตั้งเท่ากับ Lot เริ่มต้น</p>
-                            </div>
-                        </div>
-
-                        <!-- 5.3 -->
-                        <div class="space-y-2 pt-4 border-t border-dashed">
-                            <h3 class="text-xs font-bold text-blue-600 uppercase tracking-wider">5.3 Safety (Stop Out)</h3>
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <label class="font-semibold text-slate-600">เหลือทุนไว้ (%)</label>
-                                    <span id="txt-safety-pct" class="font-bold text-blue-600">30%</span>
+                        <!-- MT5 Style Inputs -->
+                        <div class="space-y-0 border-t border-slate-200">
+                            
+                            <!-- 1. Currency & 2. Start Lot -->
+                            <div class="sim-input-row">
+                                <div class="sim-input-label flex items-center">
+                                    <span class="mt5-icon-ab">ab</span> ชื่อคู่เงินที่จะเทรด >>
                                 </div>
-                                <input type="range" id="inp-safety" min="10" max="90" value="30" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" oninput="updateSim()">
-                                <p class="text-xs text-slate-500 mt-1">ระบบจะหยุดเมื่อเหลือเงิน: <strong id="txt-stopout-val">$300</strong></p>
-                            </div>
-                        </div>
-
-                        <!-- 5.4 & 5.5 -->
-                        <div class="space-y-2 pt-4 border-t border-dashed">
-                            <h3 class="text-xs font-bold text-blue-600 uppercase tracking-wider">5.4 & 5.5 ขีดจำกัด (Limits)</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Max Lot</label>
-                                    <input type="number" step="0.01" id="inp-max-lot" value="0.03" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="updateSim()">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Max Orders</label>
-                                    <input type="number" id="inp-max-orders" value="5" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="updateSim()">
+                                <div class="sim-input-field text-right text-xs text-gray-500">
+                                    XAUUSDm
                                 </div>
                             </div>
-                        </div>
+                            <div class="sim-input-row">
+                                <div class="sim-input-label flex items-center">
+                                    <span class="mt5-icon-num">1/2</span> ค่า Lot Size เริ่มต้น >>
+                                </div>
+                                <div class="sim-input-field">
+                                    <input type="number" step="0.01" id="inp-start-lot" value="0.01" class="w-full border p-1 rounded text-right text-xs" oninput="updateSim()">
+                                </div>
+                            </div>
+                            <!-- Explainer 5.1 -->
+                            <div class="info-box">
+                                <span class="info-title">5.1) ชื่อคู่เงิน & Lot Size เริ่มต้น</span>
+                                ให้ใส่ชื่อค่าคู่เงินของ โบรกนั้นๆที่จะเทรด เช่น XAUUSDm<br>
+                                <strong>Lot Size เริ่มต้น:</strong> แนะนำที่ทุน <strong>1000 : 0.01</strong>
+                            </div>
 
+                            <!-- 3. Lot Step -->
+                            <div class="sim-input-row">
+                                <div class="sim-input-label flex items-center">
+                                    <span class="mt5-icon-num">1/2</span> ค่า Lot Size ที่เพิ่มขึ้นเมื่อ Loss แต่ละครั้ง >>
+                                </div>
+                                <div class="sim-input-field">
+                                    <input type="number" step="0.01" id="inp-lot-step" value="0.01" class="w-full border p-1 rounded text-right text-xs" oninput="updateSim()">
+                                </div>
+                            </div>
+                            <p id="warning-step" class="hidden text-[10px] text-red-500 text-right bg-red-50 p-1 rounded mb-2">⚠️ ควรตั้งเท่ากับ Lot เริ่มต้น</p>
+                            <!-- Explainer 5.2 -->
+                            <div class="info-box">
+                                <span class="info-title">5.2) ค่า Lot Size ที่เพิ่มขึ้น (Step)</span>
+                                ให้ตั้งตาม Lot Size เริ่มต้น หากเริ่มต้น 0.5 ค่านี้ก็ต้อง 0.5 ด้วย เป็นระบบสำหรับนำทุนคืน
+                            </div>
+
+                            <!-- 4. Stop Program (Safety) -->
+                            <div class="sim-input-row flex-col items-stretch !items-start">
+                                <div class="sim-input-label flex items-center w-full mb-1">
+                                    <span class="mt5-icon-num">1/2</span> หยุดโปรแกรมและปิด Order ทั้งหมดเมื่อ เงินในบัญชีเหลือน้อยกว่า >
+                                </div>
+                                <div class="flex items-center justify-between w-full bg-slate-50 p-2 rounded border border-slate-100">
+                                    <div class="flex-1 mr-2">
+                                        <input type="range" id="inp-safety" min="10" max="90" value="30" class="w-full h-1 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-600" oninput="updateSim()">
+                                        <div class="text-[10px] text-slate-500">เหลือทุนไว้ <span id="txt-safety-pct" class="font-bold text-blue-600">30%</span></div>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-700 bg-white border px-2 py-1 rounded" id="txt-stopout-display">
+                                        300.0
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Explainer 5.3 -->
+                            <div class="info-box">
+                                <span class="info-title">5.3) Safety เงินทุน (Stop Out)</span>
+                                ถ้าเงินไหลหรือติดดอย เหลือเท่าไหร่ถึงจะหยุดโปรแกรม (เช่น เหลือ 1 จาก 1000) ตั้งค่าตามความเสี่ยงที่รับไหว แต่แนะนำให้เหลือ <strong>30%</strong> ของเงินทุนเผื่อเหตุการณ์ไม่คาดฝัน (เช่น ทุน 1000 เหลือไว้ 300)
+                            </div>
+
+                            <!-- 5. Max Lot -->
+                            <div class="sim-input-row">
+                                <div class="sim-input-label flex items-center">
+                                    <span class="mt5-icon-num">1/2</span> เพิ่ม Lot Size ได้มากที่สุดถึง >>
+                                </div>
+                                <div class="sim-input-field">
+                                    <input type="number" step="0.01" id="inp-max-lot" value="0.03" class="w-full border p-1 rounded text-right text-xs" oninput="updateSim()">
+                                </div>
+                            </div>
+                            <!-- Explainer 5.4 -->
+                            <div class="info-box">
+                                <span class="info-title">5.4) เพิ่ม Lot Size ได้มากที่สุด</span>
+                                คือเพดานการทบไม้ (Martingale) เช่น ถ้าคำนวณได้ 0.05 แต่เราตั้ง Max ไว้ 0.03 ระบบจะออกแค่ 0.03<br>
+                                <em>ข้อควรระวัง:</em> หากจำกัดไว้ต่ำเกินไป อาจทำให้ระบบคืนทุนช้าลงหรือเพี้ยนได้ แนะนำให้ใช้ค่า Default หรือตามความเหมาะสม
+                            </div>
+
+                            <!-- 6. Max Orders -->
+                            <div class="sim-input-row">
+                                <div class="sim-input-label flex items-center">
+                                    <span class="mt5-icon-num">1/2</span> เพิ่มจำนวนไม้ได้มากที่สุดถึง >>
+                                </div>
+                                <div class="sim-input-field">
+                                    <input type="number" id="inp-max-orders" value="5" class="w-full border p-1 rounded text-right text-xs" oninput="updateSim()">
+                                </div>
+                            </div>
+                            <!-- Explainer 5.5 -->
+                            <div class="info-box">
+                                <span class="info-title">5.5) เพิ่มจำนวนไม้ได้มากที่สุด</span>
+                                จำนวนไม้สูงสุดที่จะเปิดแก้เกม (เช่น แพ้แล้วเปิดเพิ่มเรื่อยๆ) ลูกค้าปรับได้ตามต้องการ เช่น ไม่ต้องการให้ออกไม้ที่ 4 ก็ตั้งจำกัดไว้ แต่จะมีผลต่อระยะเวลาคืนทุนหากมีการขาดทุน
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
@@ -581,7 +643,10 @@
             document.getElementById('txt-safety-pct').innerText = safetyPct + '%';
             const safeVal = Math.round(capital * (safetyPct / 100));
             const riskVal = capital - safeVal;
-            document.getElementById('txt-stopout-val').innerText = '$' + safeVal;
+            
+            // Update the display in the mockup input
+            document.getElementById('txt-stopout-display').innerText = safeVal.toFixed(1);
+
             document.getElementById('val-safe').innerText = '$' + safeVal;
             document.getElementById('val-risk').innerText = '$' + riskVal;
 
